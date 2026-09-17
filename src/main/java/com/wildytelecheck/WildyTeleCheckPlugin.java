@@ -29,7 +29,7 @@ import net.runelite.client.util.Filepath;
 @Slf4j
 @PluginDescriptor(
     name = "Wildy Tele Check",
-    internalName = "wildy_tele_check",
+    internalName = "wildy-tele-check",
     legacyDataDirectory = "wildy-tele-check",
     description = "Warns when entering the Wilderness without a selected level-30 escape teleport",
     tags = {"wilderness", "teleport", "warning", "pvp", "glory", "seed-pod"}
