@@ -1,7 +1,6 @@
 package com.wildytelecheck;
 
 import com.google.inject.Provides;
-import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
@@ -18,7 +17,6 @@ import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.VarbitID;
-import net.runelite.client.RuneLite;
 import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -26,10 +24,13 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.util.Filepath;
 
 @Slf4j
 @PluginDescriptor(
     name = "Wildy Tele Check",
+    internalName = "wildy_tele_check",
+    legacyDataDirectory = "wildy-tele-check",
     description = "Warns when entering the Wilderness without a selected level-30 escape teleport",
     tags = {"wilderness", "teleport", "warning", "pvp", "glory", "seed-pod"}
 )
@@ -433,11 +434,11 @@ public class WildyTeleCheckPlugin extends Plugin
 
         try
         {
-            final File soundDirectory = new File(RuneLite.RUNELITE_DIR, "wildy-tele-check");
-            final File customSound = getCustomSoundFile(soundDirectory, configuredFileName);
+            final Filepath soundDirectory = getPluginDirectory();
+            final Filepath customSound = getCustomSoundFile(soundDirectory, configuredFileName);
             final float gainDb = volumePercentToGainDb(volumePercent);
 
-            if (customSound.isFile())
+            if (customSound != null && customSound.isFile())
             {
                 audioPlayer.play(customSound, gainDb);
                 return;
@@ -451,7 +452,7 @@ public class WildyTeleCheckPlugin extends Plugin
         }
     }
 
-    private File getCustomSoundFile(File soundDirectory, String configuredFileName)
+    private Filepath getCustomSoundFile(Filepath soundDirectory, String configuredFileName)
     {
         String fileName = configuredFileName == null ? "" : configuredFileName.trim();
 
@@ -460,15 +461,14 @@ public class WildyTeleCheckPlugin extends Plugin
             fileName = DEFAULT_CUSTOM_SOUND_FILE;
         }
 
-        // Only use the filename itself so the setting cannot escape this plugin's folder.
-        fileName = new File(fileName).getName();
-
-        if (fileName.isEmpty())
+        try
         {
-            fileName = DEFAULT_CUSTOM_SOUND_FILE;
+            return soundDirectory.joinSegment(fileName);
         }
-
-        return new File(soundDirectory, fileName);
+        catch (IllegalArgumentException e)
+        {
+            return null;
+        }
     }
 
     private float volumePercentToGainDb(int volumePercent)
