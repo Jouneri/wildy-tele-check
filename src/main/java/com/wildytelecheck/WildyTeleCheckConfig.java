@@ -129,7 +129,7 @@ public interface WildyTeleCheckConfig extends Config
     )
     default String warningText()
     {
-        return "Dumbass you forgot your teleport!";
+        return "You forgot your teleport!";
     }
 
     @ConfigItem(
