@@ -31,7 +31,7 @@ If none are found, the plugin:
 
 The default warning text is:
 
-`Dumbass you forgot your teleport!`
+`You forgot your teleport!`
 
 All supported teleport options are enabled by default.
 
